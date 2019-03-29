@@ -14,7 +14,7 @@ using System.Net;
 
 namespace WebAPIAuthenticationClient
 {
-    public enum AUTHSTATUS { NONE,OK,INVALID,FAILED }
+    public enum AUTHSTATUS { NONE, OK, INVALID, FAILED }
 
 
     public static class ClientAuthentication
@@ -28,16 +28,21 @@ namespace WebAPIAuthenticationClient
         static public List<T> getList<T>(string endpoint)
         {
             using (var client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
-                var response = client.GetAsync(baseWebAddress + endpoint ).Result;
-                    var resultContent = response.Content.ReadAsAsync<List<T>>(
-                        new[] { new JsonMediaTypeFormatter() }).Result;
-                    return resultContent;
-                }
+            {
+                // clear the current reuest header
+                client.DefaultRequestHeaders.Accept.Clear();
+                // add new header
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // authorize the new header with a token
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
+                // get clients at address
+                var response = client.GetAsync(baseWebAddress + endpoint).Result;
+                var resultContent = response.Content.ReadAsAsync<List<T>>(
+                    new[] { new JsonMediaTypeFormatter() }).Result;
+                // return an asyncronous list of responses
+                return resultContent;
             }
+        }
 
         static public dynamic getExtGame(int gameID)
         {
@@ -53,8 +58,8 @@ namespace WebAPIAuthenticationClient
                 var jsummary = resultContent.Children()["summary"].Values<string>().FirstOrDefault();
                 // url is nested in cover object
                 var jcover = resultContent.Children()["cover"]["url"].Values<string>().FirstOrDefault();
-                var eobj = 
-                                        new 
+                var eobj =
+                                        new
                                         {
                                             Name = jname,
                                             Summary = jsummary,
@@ -76,15 +81,15 @@ namespace WebAPIAuthenticationClient
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
                     var response = client.GetAsync(baseWebAddress + EndPoint).Result;
-                    if(response.StatusCode == HttpStatusCode.OK && response.ReasonPhrase.Contains("no accounts to manage"))
+                    if (response.StatusCode == HttpStatusCode.OK && response.ReasonPhrase.Contains("no accounts to manage"))
                     {
-                        throw new Exception("Information from getItem call ",new Exception(response.ReasonPhrase));
+                        throw new Exception("Information from getItem call ", new Exception(response.ReasonPhrase));
                     }
                     var resultContent = response.Content.ReadAsAsync<T>(
                         new[] { new JsonMediaTypeFormatter() }).Result;
                     return resultContent;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw (ex);
                 }
@@ -101,8 +106,8 @@ namespace WebAPIAuthenticationClient
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
-                var response = client.PostAsJsonAsync(baseWebAddress + Endpoint,g).Result;
-                if(response.IsSuccessStatusCode)
+                var response = client.PostAsJsonAsync(baseWebAddress + Endpoint, g).Result;
+                if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine("Response Object is " + response.Content.ReadAsAsync<T>(
                         new[] { new JsonMediaTypeFormatter() }).Result.ToString());
@@ -112,7 +117,7 @@ namespace WebAPIAuthenticationClient
             }
 
         }
-    static public bool login(string username, string password)
+        static public bool login(string username, string password)
         {
             using (var client = new HttpClient())
             {
@@ -140,7 +145,7 @@ namespace WebAPIAuthenticationClient
                     }
                     else
                     {
-                        AuthToken = "Invalid Login" ;
+                        AuthToken = "Invalid Login";
                         AuthStatus = AUTHSTATUS.INVALID;
                         Console.WriteLine("Invalid credentials");
                         return false;
@@ -157,7 +162,7 @@ namespace WebAPIAuthenticationClient
             }
         }
 
-        
 
-}
+
+    }
 }
